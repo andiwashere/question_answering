@@ -13,7 +13,7 @@ To start using this script, download the ALBERT model from huggingface and save 
 tf model and tokenizer in your PRETRAINED_PATH. Furthermore, get the dataset from the squad website
 and update SQUAD_TRAIN_DATA_PATH
 """
-EPOCHS = 100
+EPOCHS = 200
 LR = [1e-2, 5e-2, 1e-3, 5e-3, 1e-4, 5e-4, 1e-5, 5e-5, 1e-6, 5e-6, 1e-7]
 BETA1 = 0.9
 BETA2 = 0.99
@@ -155,7 +155,7 @@ for lr in LR:
             # Track progress
             epoch_loss_avg(loss)
             epoch_accuracy(labels, preds)
-            epoch_grads_avg(tf.reduce_mean(tf.math.abs(accumulated_grads_0)) + f.reduce_mean(tf.math.abs(accumulated_grads_2)))
+            epoch_grads_avg(tf.reduce_mean(tf.math.abs(accumulated_grads_0)) + tf.reduce_mean(tf.math.abs(accumulated_grads_2)))
 
             if grads_idx % DESIRED_BATCH_SIZE is 0 or int(grads_idx/BATCH_SIZE) is take_data:
                 # check that avg grads don't vanish/explode
