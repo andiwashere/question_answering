@@ -62,7 +62,7 @@ with open(PRETRAINED_PATH + 'config.json') as f:
 
 # training configurations loop
 for desired_batch_size, lr in itertools.product(DESIRED_BATCH_SIZES, LR):
-    model = QaAlbertModel(config)
+    model = QaAlbertModel(config, PRETRAINED_PATH)
     linear_hidden_size = model.get_linear_hidden_size
     loss_fn = tf.keras.losses.SparseCategoricalCrossentropy()
     optimizer = tf.keras.optimizers.Adam(lr)

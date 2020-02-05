@@ -19,8 +19,8 @@ class QaAlbertModel(tf.keras.Model):
         **attentions**: (`optional`, returned when ``config.output_attentions=True``)
             list of ``Numpy array`` or ``tf.Tensor`` (one for each layer) of shape ``(batch_size, num_heads, sequence_length, sequence_length)``:
             Attentions weights after the attention softmax, used to compute the weighted average in the self-attention heads."""
-    def __init__(self, config, *inputs, **kwargs):
-        super(QaAlbertModel, self).__init__(config, *inputs, **kwargs)
+    def __init__(self, config, pretrained_path, *inputs, **kwargs):
+        super(QaAlbertModel, self).__init__(config, pretrained_path, *inputs, **kwargs)
 
         # config needs to be a dict
         self.linear_size = 128
@@ -29,7 +29,7 @@ class QaAlbertModel(tf.keras.Model):
         # set inputs to None (sequence length not known) as this is a condition for being able to save the model
         self.sequence = tf.keras.Input(shape=(None,), dtype=np.int32)
 
-        self.albert = TFAlbertModel.from_pretrained('huggingface/')
+        self.albert = TFAlbertModel.from_pretrained(pretrained_path)
 
         self.relu = tf.keras.layers.Activation('relu')
 
