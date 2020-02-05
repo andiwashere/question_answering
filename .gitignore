@@ -2,3 +2,5 @@ data/wikipedia
 data/squad/*.json
 models/
 huggingface/
+.ipynb_checkpoints/
+presentation/

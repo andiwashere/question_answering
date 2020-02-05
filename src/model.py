@@ -23,7 +23,7 @@ class QaAlbertModel(tf.keras.Model):
         super(QaAlbertModel, self).__init__(config, *inputs, **kwargs)
 
         # config needs to be a dict
-        self.linear_hidden_size = 128
+        self.linear_size = 128
         self.num_labels = config['num_labels']
 
         # set inputs to None (sequence length not known) as this is a condition for being able to save the model
@@ -31,13 +31,16 @@ class QaAlbertModel(tf.keras.Model):
 
         self.albert = TFAlbertModel.from_pretrained('huggingface/')
 
+        self.relu = tf.keras.layers.Activation('relu')
+
         # compute score of each output of a word t_i being the start or end of the answer:
         # s*t_i, e*t_j (s: start vector, e: end vector) in top layer with num_labels=2
         self.qa_linear = tf.keras.layers.Dense(
-            self.linear_hidden_size, kernel_initializer=u.get_initializer(config['initializer_range']), name="qa_linear"
+            self.linear_size, activation='relu',
+            kernel_initializer=u.get_initializer(config['initializer_range']), name="qa_linear"
         )
         self.qa_outputs = tf.keras.layers.Dense(
-            config['num_labels'], kernel_initializer=u.get_initializer(config['initializer_range']), name="qa_outputs"
+            self.num_labels, kernel_initializer=u.get_initializer(config['initializer_range']), name="qa_outputs"
         )
         # sum over sequence
         self.softmax = tf.keras.layers.Softmax(axis=1)
@@ -49,7 +52,7 @@ class QaAlbertModel(tf.keras.Model):
     def call(self, inputs, **kwargs):
         outputs = self.albert(inputs, **kwargs)
 
-        sequence_output = outputs[0]
+        sequence_output = self.relu(outputs[0])
 
         hidden_output = self.qa_linear(sequence_output)
         logits = self.qa_outputs(hidden_output)
@@ -63,8 +66,9 @@ class QaAlbertModel(tf.keras.Model):
         # add hidden states and attention if they are here
         outputs = (tf.stack([start_output, end_output], axis=1),) + outputs[2:]
 
+
         return outputs  # start_logits, end_logits, (hidden_states), (attentions)
 
     @property
     def get_linear_hidden_size(self):
-        return self.linear_hidden_size
+        return self.linear_size
